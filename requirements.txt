@@ -1,4 +1,2 @@
-json
-google
 flask
 google-genai
