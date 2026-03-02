@@ -5,6 +5,7 @@ app = Flask(__name__)
 
 client = genai.Client(api_key = "AIzaSyB36C1zyAp97-SL0RRtbvWJLWeW1rWffR8")
 
+
 @app.route("/")
 def index():
     # 'index.html' refers to the file inside the /templates folder
