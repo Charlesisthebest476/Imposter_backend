@@ -3,7 +3,7 @@ from google import genai
 from google.genai import types
 app = Flask(__name__)
 
-client = genai.Client(api_key = "AIzaSyB36C1zyAp97-SL0RRtbvWJLWeW1rWffR8")
+client = genai.Client(api_key = GEMINI_API_KEY)
 
 
 @app.route("/")
