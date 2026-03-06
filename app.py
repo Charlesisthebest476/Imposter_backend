@@ -9,6 +9,21 @@ app = Flask(__name__)
 
 
 client = genai.Client(api_key = "AIzaSyB36C1zyAp97-SL0RRtbvWJLWeW1rWffR8")
+prompt = ["INSERT categories here"]
+
+total_tokens = client.model.count_tokens(
+    model = "gemini-3.1-flash-lite-preview",
+    contents = prompt,
+)
+
+def gemini():
+    response = client.models.generate_content(
+        model = "gemini-3.1-flash-lite-preview",
+        contents = prompt,
+    )
+
+    return response
+
 
 
 @app.route("/", methods=['GET', 'POST'])
