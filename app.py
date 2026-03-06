@@ -13,6 +13,5 @@ def index():
     return render_template("index.html", result="Flask is working!")
 
 if __name__ == "__main__":
-    port = int(os.environ.get("PORT"))
+    port = int(os.environ.get("PORT", 5001))
     app.run(host='0.0.0.0', port=port, debug=True) #make flask available to the world and set debug to true for development
-    app.run(debug=True)
