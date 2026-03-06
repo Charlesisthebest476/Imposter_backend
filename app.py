@@ -1,16 +1,32 @@
-from flask import Flask, render_template
+"""Version 1.0: basic skeleton"""
+
+
+from flask import Flask, render_template, request
 from google import genai
 from google.genai import types
 import os
 app = Flask(__name__)
 
+
 client = genai.Client(api_key = "AIzaSyB36C1zyAp97-SL0RRtbvWJLWeW1rWffR8")
 
 
-@app.route("/")
+@app.route("/", methods=['GET', 'POST'])
 def index():
-    # 'index.html' refers to the file inside the /templates folder
-    return render_template("index.html", result="Flask is working!")
+    categories = ["Category 1", "Category 2", "Category 3"]  # Example categories
+    result = None
+
+    if request.method == 'POST':
+    # Get the data from the form
+        num_of_players = request.form['num_of_players']
+        num_of_imposters = request.form['num_of_imposters']
+        category = request.form['category']
+        result = 'results received'
+    return render_template("index.html", categories=categories, result=result)
+
+
+
+
 
 if __name__ == "__main__":
     port = int(os.environ.get("PORT", 5001))
