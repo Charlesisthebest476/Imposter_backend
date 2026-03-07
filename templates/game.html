@@ -1,1 +1,34 @@
+<!DOCTYPE html>
+<html>
+<head>
+  <meta charset="UTF-8">
+  <link href="{{ url_for('static', filename='style.css') }}" rel="stylesheet">
+  <title>The Actual Game</title>
+</head>
+<body>
+    <form method="POST">
+        <input type="hidden" name="game_info" value='{{ game_info_json }}'>
+        <div class="box"> 
+            <!--Formatting the box-->
+            <h1>Player {{game_info['current_player']}}</h1>
+            <p>Your role is:</p>
+            {% if game_info['current_role'] != 'hidden': %}
+                <h2>{{game_info['current_role']}}</h2>
+            {% else: %}
+                <input type="submit" name="action" value="Click Me to Reveal Role">
+            {% endif %}
+            
+            {% if game_info['word'] != '': %}
+                <p>The word is: {{ game_info['word'] }}</p>
+            {% endif %}
+        </div>
 
+        <!--Show the next player or the button to see who starts -->
+        {% if game_info['current_role'] != 'hidden' and game_info['current_player'] < game_info['num_of_players']: %}
+            <p><input type="submit" name="action" value="Next Player"></p>
+        {% elif game_info['current_player'] == game_info['num_of_players']: %}
+            <p><input type="submit" name="action" value="See Who'll Start"></p>
+        {% endif %}
+    </form>
+</body>
+</html>
