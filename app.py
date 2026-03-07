@@ -1,4 +1,8 @@
-"""Version 1.0: basic skeleton"""
+"""
+Imposter
+March 6th - Version 1.0: basic skeleton
+March 7th - Version 1.1: added game logic for game.html
+"""
 
 
 from flask import Flask, render_template, request, redirect, url_for
