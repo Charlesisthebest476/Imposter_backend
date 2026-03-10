@@ -1,0 +1,14 @@
+<!DOCTYPE html>
+<html>
+<head>
+    <meta charset="UTF-8">
+    <link href="{{ url_for('static', filename='style.css') }}" rel="stylesheet">
+    <title>Error</title>
+</head>
+<body>
+    <h1>Error</h1>
+    <p>An error occurred while processing your request.</p>
+    {% set home_url = url_for('index') %}
+    <button type="button" onclick="window.location.href='{{ home_url }}'">Go Back to Home</button>
+</body>
+</html>

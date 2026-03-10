@@ -53,6 +53,8 @@ def index():
         # Get the data from the form
         num_of_players = int(request.form['num_of_players'])
         num_of_imposters = int(request.form['num_of_imposters'])
+        if num_of_imposters > num_of_players:
+            return redirect(url_for('error')) # Redirect to an error page if the number of imposters is greater than the number of players
         imposters = chooseimposter(num_of_players, num_of_imposters)
 
         setup_data = {
@@ -104,6 +106,9 @@ def game():
     html_dict_rep = json.dumps(py_dict)
     return render_template("game.html", game_info_json=html_dict_rep, game_info=py_dict)
 
+@app.route("/error")
+def error():
+    return render_template("error.html")
 
 if __name__ == "__main__":
     port = int(os.environ.get("PORT", 5001))
