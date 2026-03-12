@@ -3,7 +3,7 @@ Imposter
 March 6th - Version 1.0: basic skeleton
 March 7th - Version 1.1: added game logic for game.html
 """
-
+# AIzaSyB36C1zyAp97-SL0RRtbvWJLWeW1rWffR8
 
 from flask import Flask, render_template, request, redirect, url_for
 from google import genai
@@ -16,14 +16,15 @@ CATEGORIES = ["Category 1", "Category 2", "Category 3"]  # Example categories
 
 app = Flask(__name__)
 
+client = genai.Client(api_key = GEMINI_API_KEY)
 
-client = genai.Client(api_key = "AIzaSyB36C1zyAp97-SL0RRtbvWJLWeW1rWffR8")
-
+# Check token usage
 total_tokens = client.models.count_tokens(
     model = "gemini-3.1-flash-lite-preview",
     contents = CATEGORIES
 )
 
+#Call function to prompt gemini
 def gemini():
     response = client.models.generate_content(
         model = "gemini-3.1-flash-lite-preview",
