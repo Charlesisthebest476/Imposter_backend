@@ -12,7 +12,7 @@ import os
 import json
 import random
 
-KEY = os.environ.get(GEMINI_API_KEY)
+KEY = os.environ.get("GEMINI_API_KEY")
 
 CATEGORIES = ["Category 1", "Category 2", "Category 3"]  # Example categories
 
