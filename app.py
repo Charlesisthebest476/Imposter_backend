@@ -19,16 +19,18 @@ app = Flask(__name__)
 client = genai.Client(api_key = GEMINI_API_KEY)
 
 # Check token usage
+"""
 total_tokens = client.models.count_tokens(
     model = "gemini-3.1-flash-lite-preview",
-    contents = CATEGORIES
+    contents = 
 )
+"""
 
 #Call function to prompt gemini
-def gemini():
+def gemini(cat):
     response = client.models.generate_content(
         model = "gemini-3.1-flash-lite-preview",
-        contents = CATEGORIES
+        contents = cat
     )
 
     return response
