@@ -2,6 +2,7 @@
 Imposter
 March 6th - Version 1.0: basic skeleton
 March 7th - Version 1.1: added game logic for game.html
+March 12th - Version 1.2: environment key set
 """
 # AIzaSyB36C1zyAp97-SL0RRtbvWJLWeW1rWffR8
 
