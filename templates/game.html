@@ -15,7 +15,7 @@
             {% if game_info['current_role'] != 'hidden': %}
                 <h2>{{game_info['current_role']}}</h2>
             {% else: %}
-                <input type="submit" name="action" value="Click Me to Reveal Role">
+                <input type="submit" name="action" value="Click Me to Reveal Role" class = "reveal">
             {% endif %}
             
             {% if game_info['word'] != '': %}
@@ -25,9 +25,9 @@
 
         <!--Show the next player or the button to see who starts -->
         {% if game_info['current_role'] != 'hidden' and game_info['current_player'] < game_info['num_of_players']: %}
-            <p><input type="submit" name="action" value="Next Player"></p>
+            <p><input type="submit" name="action" value="Next Player" class = "button"></p>
         {% elif game_info['current_player'] == game_info['num_of_players']: %}
-            <p><input type="submit" name="action" value="See Who'll Start"></p>
+            <p><input type="submit" name="action" value="See Who'll Start" class = "button"></p>
         {% endif %}
     </form>
 </body>
