@@ -1,11 +1,45 @@
 
-
 .box {
-    width: 200px;
-    height: 300px;
-    border-radius: 25px
+    width: 250px;
+    height: 400px;
+    border: 15px solid #CD5C5C;
+    border-radius: 25px;
     background-color: #CD5C5C;
     padding: 20px;
     margin: auto;
+    margin-top: 200px;
+    text-align: center;
+    color: white;
+}
+
+.button {
+    background-color: #ca4b47;
+    color: white;
+    padding: 10px 20px;
+    border: none;
+    border-radius: 5px;
+    cursor: pointer;
+    font-size: 14px;
+    display: block;
+    margin: 50px auto;
+    width: auto;
+    text-align: center;
+}
+
+.button:hover {
+    background-color: #ce312c;
+}
+
+.reveal {
+    background-color: #ece0df;
+    color: rgb(0, 0, 0);
+    padding: 10px 20px;
+    border: none;
+    border-radius: 5px;
+    cursor: pointer;
+    font-size: 14px;
+    display: block;
+    margin: 60px auto;
+    width: auto;
     text-align: center;
 }
