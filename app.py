@@ -16,7 +16,7 @@ import random
 
 
 
-
+KEY = os.environ.get("GEMINI_API_KEY")
 
 
 CATEGORIES = ["Food", "Animal", "Location"]  # Example categories
@@ -25,7 +25,7 @@ CATEGORIES = ["Food", "Animal", "Location"]  # Example categories
 app = Flask(__name__)
 
 
-client = genai.Client(api_key="nothing for now") #replace with actual API
+client = genai.Client(api_key= KEY) #replace with actual API
 
 
 # Check token usage
@@ -43,13 +43,8 @@ def gemini(cat):
         model = "gemini-3.1-flash-lite-preview",
         contents = cat
     )
-    repr(response)
+    return response
     #returns a list and first word is the normal word and second word is the imposter word
-
-
-    return response.text.split(",") #split the response into two words based on the comma, this is just an example and can be changed based on how you want to format the response from gemini
-
-
 
 
 def chooseimposter(num_of_players, num_of_imposters):
@@ -60,11 +55,7 @@ def chooseimposter(num_of_players, num_of_imposters):
     # Randomly select imposters
     imposters = random.sample(players, num_of_imposters)
 
-
     return imposters
-
-
-
 
 
 
