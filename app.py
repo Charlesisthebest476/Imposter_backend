@@ -41,9 +41,9 @@ total_tokens = client.models.count_tokens(
 def gemini(cat):
     response = client.models.generate_content(
         model = "gemini-3.1-flash-lite-preview",
-        contents = cat
+        contents = f"Given the following categories provided, randomly select one of the categories, then generate a random word that relates to one of them. Based off of that generated word, generate a list of 5 hint words that relate to the word. Make sure that the hint words do not contain the original word in itself, or is a direct synonym of it. The hint words should not be too obvious such that the first instinctual connection is to the original word. The original word does not necessarily have to be one singular word, but must be a single object, or concept, or place. The generated words must not exceed a length of 3 words. The hint words must be 1 word in length. Respond with only the generated words in a string, with each separated with a comma. The categories are {cat}"
     )
-    return response
+    return response.text.split(",")
     #returns a list and first word is the normal word and second word is the imposter word
 
 
