@@ -1,0 +1,21 @@
+<!DOCTYPE html>
+<html>
+<head>
+  <meta charset="UTF-8">
+  <link href="{{ url_for('static', filename='style.css') }}" rel="stylesheet"> <!-- Link to mayber different CSS file -->
+  <title>Player Names</title>
+</head>
+<body>
+  <h1>Player Names</h1>
+  <form method="POST">
+    <label for="player_names">Enter Player Names (comma-separated):</label>
+    {% for i in {{game_info['num_of_players'}}%} <!-- placeholder -->
+      <input type="text" name="player_name_{{i}}" placeholder="Player {{i}}" required><br>
+    {% endfor %}
+    <input type="text" id="player_names" name="player_names" required>
+    <button type="submit">Start Game</button>
+  </form>
+</body>
+
+
+</html>
