@@ -7,7 +7,7 @@
 </head>
 <body>
     <h1>Error</h1>
-    <p>An error occurred while processing your request.</p>
+    <p>An error occurred while processing your request. Error: {{ error }}</p>
     {% set home_url = url_for('index') %}
     <button type="button" onclick="window.location.href='{{ home_url }}'">Go Back to Home</button>
 </body>
