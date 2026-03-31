@@ -154,7 +154,7 @@ def player_names():
         for value in request.form.items():
             name_list.append(value[1]) #this is the content
         py_dict['player_names'] = name_list
-        return redirect(url_for('game', initial_info=json.dumps(py_dict))) #redirect to game page with the same info, we can also change the info if we want to add player names or something like that in the future
+        return redirect(url_for('game', large_string = "kshbdfhusain5cy87wet67tywo875t8348ug9wyejguygsdutu8t9f87t45ntoti5utv8ft4598nt8gt89et5ne876tnfsegngjhdsfgnhhmeumhoiumhahsdmiuthoey598ynb9y58obn3qoeottgjyoge8gt8nygcygmtgaiuorgtbirgouiogouibdfjgt8", initial_info=json.dumps(py_dict))) #redirect to game page with the same info, we can also change the info if we want to add player names or something like that in the future
     return render_template("player_names.html", game_info_json=request.args.get('initial_info'), game_info=json.loads(request.args.get('initial_info'))) #pass the info from the index page to the player names page so we can use it in the form
 
 #now the dictionary looks like this:
