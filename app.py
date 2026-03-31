@@ -202,7 +202,7 @@ def game():
                 py_dict['current_role'] = "Citizen"
                 py_dict['word'] = py_dict['normal_word']
         if action == "See Who'll Start":
-            return redirect(url_for('who_start', new_info=json.dumps(py_dict)))
+            return redirect(url_for('who_start', large_string="iushfiuye87r683896793767983275698739876hkjgdkfgbkdbjhbdfghjhgjdskjgnkdsfgjdjghdkbgdhijgorhtoiu5u0935k4985kj3958y3jih59y8tuyfhkj3589t3jh5gutfh3ioy45", new_info=json.dumps(py_dict)))
     else:
         #get info from the previous page
         initial_info_str = request.args.get('initial_info')
