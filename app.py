@@ -137,7 +137,7 @@ def index():
                 "current_role": "hidden"
             }
             # We use json.dumps so we can pass it as one string
-            return redirect(url_for('player_names', initial_info=json.dumps(setup_data)))
+            return redirect(url_for('player_names', large_string = "fhieujc3it568nuywgyv8ageuhzubimhewhvnuq89egtniougkr87etoutt8wydy5ku6aow864i8yto5yiouysejyteljwehkjasoijheboisudfyjhvaroiysakhdbo8xzfy8u356jlhgq37634986hkf8qe5kjwywk4h5bir6",initial_info=json.dumps(setup_data)))
         except Exception as e:
             return redirect(url_for('error', error=str(e))) # Redirect to an error page if gemini fails to generate words
     return render_template("index.html", categories=categories)
