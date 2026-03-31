@@ -1,0 +1,14 @@
+<!DOCTYPE html>
+<html>
+<head>
+    <meta charset="UTF-8">
+    <link href="{{ url_for('static', filename='style.css') }}" rel="stylesheet">
+    <title>Who Starts?</title>
+</head>
+<body>
+    <p>{{ game_info['starting_player'] }} will start the game!</p>
+    <form method="post">
+        <button type="submit">Proceed to Voting</button>
+    </form>
+</body>
+</html>
