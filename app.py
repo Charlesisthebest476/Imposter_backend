@@ -16,7 +16,6 @@ from flask import Flask, render_template, request, redirect, url_for
 from google import genai
 from google.genai import types
 import os
-import json
 import random
 from flask import session
 from rules import Rules #import rules class
@@ -61,7 +60,7 @@ def gemini(cat):
     while i < len(AI_MODELS) and response is None: #try different models if the first one fails
         response = client.models.generate_content(
             model = AI_MODELS[i],
-            generate_content_config = types.GenerateContentConfig(
+            config = types.GenerateContentConfig(
                 thinking_config = types.ThinkingConfig(thinking_level = "HIGH")
             ),
             contents = ("Given the following categories provided, randomly select one of the categories, then generate a random word that relates to one of them."
