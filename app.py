@@ -61,6 +61,9 @@ def gemini(cat):
     while i < len(AI_MODELS) and response is None: #try different models if the first one fails
         response = client.models.generate_content(
             model = AI_MODELS[i],
+            generate_content_config = types.GenerateContentConfig(
+                thinking_config = types.ThinkingConfig(thinking_level = "HIGH")
+            ),
             contents = ("Given the following categories provided, randomly select one of the categories, then generate a random word that relates to one of them."
                 "Based off of that generated word, generate a list of 5 hint words that relate to the word. Make sure that the hint words do not contain the original word in itself,"
                 "or is a direct synonym of it. The hint words should not be too obvious such that the first instinctual connection is to the original word."
