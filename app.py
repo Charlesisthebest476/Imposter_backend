@@ -6,6 +6,7 @@ March 12th - Version 1.2: environment key set
 March 23rd - Version 1.3: Successful connection with AI
 March 25th - Version 1.4: Debugging the issue with the Gemini server not responding
 March 30th - Version 1.5: Added environment variables to ensure security
+April 1st - Version 1.6: Replaced URL data passing with Flask sessions for better security
 """
 
 
@@ -17,6 +18,7 @@ from google.genai import types
 import os
 import json
 import random
+from flask import session
 from rules import Rules #import rules class
 
 
@@ -30,11 +32,10 @@ rules = Rules()
 
 CATEGORIES = ["Food", "Animal", "Location"]  # Example categories
 AI_MODELS = ["gemini-3.1-flash-lite-preview", "gemini-2.5-flash-lite", "gemini-2.0-flash-lite"]
-
+KEY = os.environ.get("KEY")
 
 app = Flask(__name__)
-
-KEY = os.environ.get("KEY")
+app.secret_key = os.environ.get("SECRET_KEY")
 
 
 client = genai.Client(api_key=KEY) #replace with actual API
@@ -136,10 +137,11 @@ def index():
                 "current_player": 1,
                 "current_role": "hidden"
             }
-            # We use json.dumps so we can pass it as one string
-            return redirect(url_for('player_names', large_string = "fhieujc3it568nuywgyv8ageuhzubimhewhvnuq89egtniougkr87etoutt8wydy5ku6aow864i8yto5yiouysejyteljwehkjasoijheboisudfyjhvaroiysakhdbo8xzfy8u356jlhgq37634986hkf8qe5kjwywk4h5bir6",initial_info=json.dumps(setup_data)))
+            session['game_data'] = setup_data  # Store data in session
+            return redirect(url_for('player_names'))
         except Exception as e:
-            return redirect(url_for('error', error=str(e))) # Redirect to an error page if gemini fails to generate words
+            session['error'] = str(e)
+            return redirect(url_for('error')) # Redirect to an error page if gemini fails to generate words
     return render_template("index.html", categories=categories)
 
 
@@ -148,14 +150,13 @@ def index():
 @app.route("/player_names", methods=['GET', 'POST'])
 def player_names():
     if request.method == 'POST':
-        html_str = request.args.get('initial_info')
-        py_dict = json.loads(html_str)
         name_list = []
         for value in request.form.items():
             name_list.append(value[1]) #this is the content
-        py_dict['player_names'] = name_list
-        return redirect(url_for('game', large_string = "kshbdfhusain5cy87wet67tywo875t8348ug9wyejguygsdutu8t9f87t45ntoti5utv8ft4598nt8gt89et5ne876tnfsegngjhdsfgnhhmeumhoiumhahsdmiuthoey598ynb9y58obn3qoeottgjyoge8gt8nygcygmtgaiuorgtbirgouiogouibdfjgt8", initial_info=json.dumps(py_dict))) #redirect to game page with the same info, we can also change the info if we want to add player names or something like that in the future
-    return render_template("player_names.html", game_info_json=request.args.get('initial_info'), game_info=json.loads(request.args.get('initial_info'))) #pass the info from the index page to the player names page so we can use it in the form
+        session['game_data']['player_names'] = name_list
+        session.modified = True
+        return redirect(url_for('game'))
+    return render_template("player_names.html", game_info=session.get('game_data')) #pass the info from the index page to the player names page so we can use it in the form
 
 #now the dictionary looks like this:
 """
@@ -178,11 +179,6 @@ def player_names():
 def game():
     if request.method == 'POST':
         action = request.form['action']
-        # Get bundled data from form
-        dict_str_rep = request.form['game_info']
-
-        #turn it into readable dictionary
-        py_dict = json.loads(dict_str_rep)
 
 
 
@@ -190,37 +186,30 @@ def game():
         #for changing variables in the dictionary
         if action == "Next Player":
             #reset role and word for next player
-            py_dict['current_role'] = "hidden"
-            py_dict['word'] = ''
-            py_dict['current_player'] += 1
+            session['game_data']['current_role'] = "hidden"
+            session['game_data']['word'] = ''
+            session['game_data']['current_player'] += 1
         elif action == "Click Me to Reveal Role":
             #detect imposter
-            if py_dict['current_player'] in py_dict['imposters']:
-                py_dict['current_role'] = "Imposter"
-                py_dict['word'] = py_dict['imposter_word']
+            if session['game_data']['current_player'] in session['game_data']['imposters']:
+                session['game_data']['current_role'] = "Imposter"
+                session['game_data']['word'] = session['game_data']['imposter_word']
             else:
-                py_dict['current_role'] = "Citizen"
-                py_dict['word'] = py_dict['normal_word']
+                session['game_data']['current_role'] = "Citizen"
+                session['game_data']['word'] = session['game_data']['normal_word']
+        session.modified = True #mark the session as modified to ensure changes are saved
         if action == "See Who'll Start":
-            return redirect(url_for('who_start', large_string="iushfiuye87r683896793767983275698739876hkjgdkfgbkdbjhbdfghjhgjdskjgnkdsfgjdjghdkbgdhijgorhtoiu5u0935k4985kj3958y3jih59y8tuyfhkj3589t3jh5gutfh3ioy45", new_info=json.dumps(py_dict)))
-    else:
-        #get info from the previous page
-        initial_info_str = request.args.get('initial_info')
-        #turn it into a dictionary. This is for the rest of the code in this function to be able to read the info
-        py_dict = json.loads(initial_info_str)
-    #turn the py dictionary back into a string so that the hidden input can send to the html
-    html_dict_rep = json.dumps(py_dict)
-    return render_template("game.html", game_info_json=html_dict_rep, game_info=py_dict)
+            return redirect(url_for('who_start'))
+    return render_template("game.html", game_info=session.get('game_data'))
 
 
 @app.route("/who_start", methods=['POST', 'GET'])
 def who_start():
-    new_info = request.args.get('new_info')
-    py_dict = json.loads(new_info)
-    py_dict['starting_player'] = random.randint(1, py_dict['num_of_players']) #randomly select a player to start, this is completely random so no hint is given to the players who are trying to find the imposter
     if request.method == 'POST':
-        return redirect(url_for('voting', new2_info=json.dumps(py_dict)))
-    return render_template("who_start.html", game_info=py_dict)
+        return redirect(url_for('voting'))
+    session['game_data']['starting_player'] = random.randint(1, session['game_data']['num_of_players']) #randomly select a player to start, this is completely random so no hint is given to the players who are trying to find the imposter
+    session.modified = True
+    return render_template("who_start.html", game_info=session.get('game_data')) 
 
 #now the dictionary looks like this:
 """
@@ -241,18 +230,14 @@ def who_start():
 
 @app.route("/voting", methods=['POST', 'GET'])
 def voting():
-    new2_info = request.args.get('new2_info')
-    py_dict = json.loads(new2_info)
-    return render_template("voting.html", game_info=py_dict) #we can use the same info from the previous page since the voting page also needs to know who the players are and stuff like that, we can also change the info if we want to add voting results or something like that in the future
+    return render_template("voting.html", game_info=session.get('game_data')) #we can use the same info from the previous page since the voting page also needs to know who the players are and stuff like that, we can also change the info if we want to add voting results or something like that in the future
 
 
 @app.route("/error")
 def error():
-    if request.args.get('error'):
-        error_message = request.args.get('error')
-        return render_template("error.html", error=error_message)
-    else:
-        return render_template("error.html", error="An unknown error occurred. Please try again later.")
+    if 'error' in session:
+        return render_template("error.html", error=session['error'])
+    return render_template("error.html", error="An unknown error occurred. Please try again later.")
 
 
 
