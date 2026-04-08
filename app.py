@@ -233,6 +233,30 @@ def who_start():
 
 @app.route("/voting", methods=['POST', 'GET'])
 def voting():
+    game_data = session['game_data']
+
+
+    if request.method == 'POST':
+        action = request.form['action']
+        voted_player = request.form['voted_player']
+        game_data['voting_result'][voted_player] = game_data['voting_result'][voted_player] + 1 if game_data['voting_result'].get(voted_player, None) is not None else 1
+        session['game_data']['current_player'] += 1
+    else:
+        game_data['voting_result'] = {}
+        session['game_data']['current_player'] = 1
+
+
+    vote_list = []
+
+
+    if game_data['current_player'] < game_data['num_of_players']:
+        for player in session['game_data']['player_names']:
+            if player != game_data['player_names'][game_data['current_player'] - 1]: #-1 cause player numbers start with 1 and index starts with 0
+                vote_list.append(player)
+        session['game_data']['current_vote_list'] = vote_list
+
+
+    session.modified = True
     return render_template("voting.html", game_info=session.get('game_data')) #we can use the same info from the previous page since the voting page also needs to know who the players are and stuff like that, we can also change the info if we want to add voting results or something like that in the future
 
 
