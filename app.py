@@ -62,7 +62,7 @@ def gemini(cat):
         response = client.models.generate_content(
             model = AI_MODELS[i],
             config = types.GenerateContentConfig(
-                thinking_config = types.ThinkingConfig(thinking_level = "HIGH")
+                thinking_config = types.ThinkingConfig(thinking_level = "MEDIUM")
             ),
             contents = ("Given the following categories provided, randomly select one of the categories, then generate a random word that relates to one of them."
                 "Based off of that generated word, generate a list of 5 hint words that relate to the word. Make sure that the hint words do not contain the original word in itself,"
