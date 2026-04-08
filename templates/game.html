@@ -10,7 +10,7 @@
         <input type="hidden" name="game_info" value='{{ game_info_json }}'>
         <div class="box"> 
             <!--Formatting the box-->
-            <h1>Player {{game_info['current_player']}}</h1>
+            <h1>Player {{game_info['current_player']}}: {{game_info['player_names'][game_info['current_player'] - 1]}}</h1> <!--player_names is a list-->
             <p>Your role is:</p>
             {% if game_info['current_role'] != 'hidden': %}
                 <h2>{{game_info['current_role']}}</h2>

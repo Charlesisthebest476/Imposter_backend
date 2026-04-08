@@ -210,7 +210,7 @@ def game():
 def who_start():
     if request.method == 'POST':
         return redirect(url_for('voting'))
-    session['game_data']['starting_player'] = random.randint(1, session['game_data']['num_of_players']) #randomly select a player to start, this is completely random so no hint is given to the players who are trying to find the imposter
+    session['game_data']['starting_player'] = random.randint(0, session['game_data']['num_of_players'] - 1) #randomly select a player to start, this is completely random so no hint is given to the players who are trying to find the imposter
     session.modified = True
     return render_template("who_start.html", game_info=session.get('game_data')) 
 
@@ -226,7 +226,8 @@ def who_start():
     "current_player": 1,
     "current_role": "hidden",
     "player_names": ["Alice", "Bob", "Charlie", "David", "Eve"],
-    "starting_player": 3
+    "starting_player": 3, 
+    "error": "All AI models failed to generate a response"
 }
 """
 
@@ -238,9 +239,13 @@ def voting():
 
     if request.method == 'POST':
         action = request.form['action']
-        voted_player = request.form['voted_player']
-        game_data['voting_result'][voted_player] = game_data['voting_result'][voted_player] + 1 if game_data['voting_result'].get(voted_player, None) is not None else 1
-        session['game_data']['current_player'] += 1
+        if action == "Next Player":
+            voted_player = request.form['voted_player']
+            #add player vote to the voting result, if the player is already voted for, add 1, if not, set it to 1
+            game_data['voting_result'][voted_player] = game_data['voting_result'][voted_player] + 1 if game_data['voting_result'].get(voted_player, None) is not None else 1
+            session['game_data']['current_player'] += 1
+        if action == "See Voting Result":
+            return redirect(url_for('voting_result'))
     else:
         game_data['voting_result'] = {}
         session['game_data']['current_player'] = 1
