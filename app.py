@@ -40,7 +40,6 @@ client = genai.Client(api_key=KEY) #replace with actual API
 
 
 
-
 # Check token usage(not used currently)
 """
 total_tokens = client.models.count_tokens(
@@ -89,14 +88,8 @@ def chooseimposter(num_of_players, num_of_imposters):
     # Create a list of players
     players = list(range(1, num_of_players + 1))
 
-
-
-
     # Randomly select imposters
     imposters = random.sample(players, num_of_imposters)
-
-
-
 
     return imposters
 
