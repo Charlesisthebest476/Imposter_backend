@@ -8,6 +8,7 @@ March 25th - Version 1.4: Debugging the issue with the Gemini server not respond
 March 30th - Version 1.5: Added environment variables to ensure security
 April 1st - Version 1.6: Replaced URL data passing with Flask sessions for better security
 April 8th - Version 1.7: Working on voting system
+April 9th - Version 1.8: Completing the prototype, including final game logic, voting system, and imposter guess word
 """
 
 
