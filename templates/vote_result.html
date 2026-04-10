@@ -7,5 +7,17 @@
 </head>
 <body>
     <h1>Voting Result</h1>
+    {% for player in game_info['ordered_players'] %}
+        <p>{{ player }}: {{ game_info['voting_result'][player] }} votes</p>
+    {% endfor %}
+    <form method="post">
+        {% if game_info['most_voted_player'] is none %}
+            <p>The vote is tied. No one is voted out. Play one more round before voting again.</p>
+            <p><input type="submit" name="action" value="Revote"></p>
+        {% else %}
+            <p>{{ game_info['most_voted_player'] }} is voted out!</p>
+            <p><input type="submit" name="action" value="Continue"></p>
+        {% endif %}
+    </form>
 </body>
 </html>

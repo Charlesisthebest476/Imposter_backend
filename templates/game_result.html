@@ -1,0 +1,18 @@
+<!DOCTYPE html>
+<html>
+<head>
+    <meta charset="UTF-8">
+    <link href="{{ url_for('static', filename='style.css') }}" rel="stylesheet">
+    <title>Game Result</title>
+</head>
+<body>
+    <h1>Game Result</h1>
+    {% if game_info['game_result'] == 'Imposters Win' %}
+        <p>The Imposters win! The word was "{{ game_info['normal_word'] }}".</p>
+    {% else %}
+        <p>The Citizens win! The imposters were {{ game_info['imposter_names']|join(', ') }}.</p>
+    {% endif %}
+    <form method="post">
+        <p><input type="submit" name="action" value="Homepage" class="button"></p>
+    </form>
+</html>

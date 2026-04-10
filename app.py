@@ -11,8 +11,6 @@ April 8th - Version 1.7: Working on voting system
 """
 
 
-
-
 from flask import Flask, render_template, request, redirect, url_for
 from google import genai
 from google.genai import types
@@ -59,20 +57,23 @@ def gemini(cat):
     i = 0
     response = None
     while i < len(AI_MODELS) and response is None: #try different models if the first one fails
-        response = client.models.generate_content(
-            model = AI_MODELS[i],
-            config = types.GenerateContentConfig(
-                thinking_config = types.ThinkingConfig(thinking_level = "MEDIUM")
-            ),
-            contents = ("Given the following categories provided, randomly select one of the categories, then generate a random word that relates to one of them."
-                "Based off of that generated word, generate a list of 5 hint words that relate to the word. Make sure that the hint words do not contain the original word in itself,"
-                "or is a direct synonym of it. The hint words should not be too obvious such that the first instinctual connection is to the original word."
-            "The original word does not necessarily have to be one singular word, but must be a single object, or concept, or place. The generated words must not exceed a length of 3 words. "
-            "The hint words must be 1 word in length. "
-            f"Respond with only the generated words in a string, no other words, with each separated with a comma. The categories are {', '.join(cat)}"
-            )#sectioned into different lines for readability, the local var cat is sent to the AI for word generation
-        )
-        print(response.text) #debug
+        try:
+            response = client.models.generate_content(
+                model = AI_MODELS[i],
+                config = types.GenerateContentConfig(
+                    thinking_config = types.ThinkingConfig(thinking_level = "MEDIUM")
+                ),
+                contents = ("Given the following categories provided, randomly select one of the categories, then generate a random word that relates to one of them."
+                    "Based off of that generated word, generate a list of 5 hint words that relate to the word. Make sure that the hint words do not contain the original word in itself,"
+                    "or is a direct synonym of it. The hint words should not be too obvious such that the first instinctual connection is to the original word."
+                "The original word does not necessarily have to be one singular word, but must be a single object, or concept, or place. The generated words must not exceed a length of 3 words. "
+                "The hint words must be 1 word in length. "
+                f"Respond with only the generated words in a string, no other words, with each separated with a comma. The categories are {', '.join(cat)}"
+                )#sectioned into different lines for readability, the local var cat is sent to the AI for word generation
+            )
+            print(response.text) #debug
+        except:
+            response = None
         i +=1
     if response is None:
         raise Exception("All AI models failed to generate a response") #if all models fail, raise an exception to be caught in the index function
@@ -236,39 +237,148 @@ def who_start():
 def voting():
     game_data = session['game_data']
 
-
     if request.method == 'POST':
         action = request.form['action']
-        if action == "Next Player":
-            voted_player = request.form['voted_player']
-            #add player vote to the voting result, if the player is already voted for, add 1, if not, set it to 1
-            game_data['voting_result'][voted_player] = game_data['voting_result'][voted_player] + 1 if game_data['voting_result'].get(voted_player, None) is not None else 1
-            session['game_data']['current_player'] += 1
+        #voting logic
+        voted_player = request.form['voted_player']
+        #add player vote to the voting result, if the player is already voted for, add 1, if not, set it to 1
+        game_data['voting_result'][voted_player] = game_data['voting_result'][voted_player] + 1 if game_data['voting_result'].get(voted_player, None) is not None else 1
+        
+        print(f"voting_result: {game_data['voting_result']}") #debug
+
+        game_data['current_player'] += 1
         if action == "See Voting Result":
-            return redirect(url_for('voting_result'))
+            session.modified = True
+            return redirect(url_for('vote_result'))
     else:
         game_data['voting_result'] = {}
-        session['game_data']['current_player'] = 1
+        game_data['current_player'] = 1
 
-
+    #for frontend display of which players can be voted for
     vote_list = []
+    for player in game_data['player_names']:
+        if player != game_data['player_names'][game_data['current_player'] - 1]: #-1 cause player numbers start with 1 and index starts with 0
+            vote_list.append(player)
+    game_data['current_vote_list'] = vote_list
 
+    session.modified = True
+    return render_template("voting.html", game_info=session.get('game_data')) 
 
-    if game_data['current_player'] < game_data['num_of_players']:
-        for player in session['game_data']['player_names']:
-            if player != game_data['player_names'][game_data['current_player'] - 1]: #-1 cause player numbers start with 1 and index starts with 0
-                vote_list.append(player)
-        session['game_data']['current_vote_list'] = vote_list
+#visualization of the current session dictionary
+"""
+{
+    "num_of_players": 5,
+    "num_of_imposters": 2,
+    "category": ["Food"],
+    "imposters": [2, 4],
+    "normal_word": "Pizza",
+    "imposter_word": "Burger",
+    "current_player": 1,
+    "current_role": "hidden",
+    "player_names": ["Alice", "Bob", "Charlie", "David", "Eve"],
+    "starting_player": 3,
+    "error": "All AI models failed to generate a response",
+    "current_vote_list": ["Alice", "Bob", "Charlie", "David"],
+    "voting_result": {"Alice": 3, "Bob": 1, "David": 1},
+}
+"""
+
+@app.route("/vote_result", methods=['POST', 'GET'])
+def vote_result():
+    game_data = session['game_data']
+    if request.method == 'POST':
+        action = request.form['action']
+        if action == "Continue":
+            #game logic for determining whether to ask the imposter for the word or end the game based on the voting result
+            imposter_names = [game_data['player_names'][player-1] for player in game_data['imposters']] #-1 because imposter is starts from 1
+            game_data['imposter_names'] = imposter_names 
+            session.modified = True
+            if game_data['most_voted_player'] in imposter_names:
+                return redirect(url_for('imposter_guess'))
+            else:
+                return redirect(url_for('game_result'))
+        elif action == "Revote":
+            #need to revote
+            return redirect(url_for('voting'))
+    # Show an ordered list, from top to bottom of the players with most to least votes
+    # I think there are two ways to approach this:
+    # 1. convert dictionary to 2-d list, then sort that 2-d list based on the second element. 
+    #    With my current knowledge of python, this will take a while as I have to write a
+    #    sorting alg for 2-d list and run it
+    # 2. clone the dictionary, then repeatedly find the max value in the dictionary, 
+    #    add that key to the ordered list, then remove that key from the dictionary, 
+    #    and repeat until the dictionary is empty(essentially selection sort). 
+    #    This will be faster to implement as I can use the built in max function for dictionaries, 
+    #    but it is less efficient as it has to loop through the dictionary multiple times.
+    # However, given that the number of players is at most 10, this inefficiency is negligible and 
+    # I will go with this approach for simplicity and speed of implementation.
+    residuals_player = game_data['voting_result'].copy()
+    ordered_players = []
+    while len(residuals_player) > 0:
+        max_voted_player = max(residuals_player, key=residuals_player.get)#find the key with the max value
+        ordered_players.append(max_voted_player)
+        del residuals_player[max_voted_player]
+    game_data['ordered_players'] = ordered_players
+    
+    if game_data['voting_result'][ordered_players[0]] == game_data['voting_result'][ordered_players[1]]:
+        game_data['most_voted_player'] = None
+    else:
+        #decision for asking the imposter for word or not
+        game_data['most_voted_player'] = ordered_players[0]
 
 
     session.modified = True
-    return render_template("voting.html", game_info=session.get('game_data')) #we can use the same info from the previous page since the voting page also needs to know who the players are and stuff like that, we can also change the info if we want to add voting results or something like that in the future
+    return render_template("vote_result.html", game_info=session.get('game_data'))
 
+@app.route("/imposter_guess", methods=['POST', 'GET'])
+def imposter_guess():
+    game_data = session['game_data']
+    if request.method == 'POST':
+        action = request.form['action']
+        if action == "Imposter Guess":
+            guessed_word = request.form['guessed_word']
+            if guessed_word.strip().lower() == game_data['normal_word'].lower():
+                game_data['imposter_guess_result'] = "correct"
+            else:
+                game_data['imposter_guess_result'] = "incorrect"
+            session.modified = True
+            return redirect(url_for('game_result'))
+    return render_template("imposter_guess.html", game_info=session.get('game_data'))
+
+
+
+@app.route("/game_result", methods=['POST', 'GET'])
+def game_result():
+    game_data = session['game_data']
+    if request.method == 'POST':
+        #store the word in the session for the next game, this is used to make sure that the same word is not generated in the next game
+        if not session.get('previous_words'):
+            previous_words = [game_data['normal_word']]
+        else:
+            previous_words = session['previous_words']
+            previous_words.append(game_data['normal_word'])
+        session.pop('game_data', None)
+        session['previous_words'] = previous_words[-20:] #store last 20 cause session max is 4kb
+        session.modified = True
+        return redirect(url_for('index'))
+        
+    if game_data['most_voted_player'] not in game_data['imposter_names']:
+        game_data['game_result'] = "Imposters Win"
+    else:
+        if game_data['imposter_guess_result'] == "correct":
+            game_data['game_result'] = "Imposters Win"
+        else:
+            game_data['game_result'] = "Citizens Win"
+    return render_template("game_result.html", game_info=session.get('game_data'))
 
 @app.route("/error")
 def error():
+    #maybe validation can be done here
     if 'error' in session:
-        return render_template("error.html", error=session['error'])
+        #clear error message
+        error_message = session['error']
+        session.pop('error', None)
+        return render_template("error.html", error=error_message)
     return render_template("error.html", error="An unknown error occurred. Please try again later.")
 
 

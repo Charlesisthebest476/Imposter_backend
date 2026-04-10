@@ -7,6 +7,20 @@
 </head>
 <body>
     <h1>Voting</h1>
+    <h1>Player {{game_info['current_player']}}: {{game_info['player_names'][game_info['current_player'] - 1]}}, vote for who you think is the imposter</h1> <!--player_names is a list-->
+    <form method="post">
+        {% for player in game_info['current_vote_list'] %}
+            <input type="radio" id="{{ player }}" name="voted_player" value="{{ player }}" required>
+            <label for="player{{ loop.index }}">{{ player }}</label><br>
+        {% endfor %}
+
+        {% if game_info['current_player'] == game_info['num_of_players'] %}
+            <p><input type='submit' name="action" value="See Voting Result" class="button"></p>
+        {% else %}
+            <p><input type="submit" name="action" value="Next Player" class="button"></p>
+        {% endif %}
+
+    </form>
 </body>
 
 </html>
