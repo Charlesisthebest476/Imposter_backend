@@ -25,7 +25,7 @@
     <div class="category-container">
       {% for category in categories: %}
         <label>
-          <input type="checkbox" name="category" value="{{ category }}">
+          <input type="checkbox" name="category" value="{{ category }}" required>
           {{ category }}
         </label>
       {% endfor %}
