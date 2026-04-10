@@ -4,7 +4,17 @@
   <meta charset="UTF-8">
   <link href="{{ url_for('static', filename='style.css') }}" rel="stylesheet">
   <title>Imposter</title>
-  
+  <script>
+    function validateForm(){
+      const numOfPlayers = document.querySelector('input[name="num_of_players"]').value;
+      const numOfImposters = document.querySelector('input[name="num_of_imposters"]').value;
+      if (numOfImposters >= numOfPlayers) {
+        alert("Number of imposters must be less than the number of players.");
+        return false;
+      }
+      return true;
+    }
+  </script>
 </head>
 <body>
   <h1>Welcome to imposter!</h1>
