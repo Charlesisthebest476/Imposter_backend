@@ -11,7 +11,7 @@
     <form method="post">
         {% for player in game_info['current_vote_list'] %}
             <input type="radio" id="{{ player }}" name="voted_player" value="{{ player }}" required>
-            <label for="player{{ loop.index }}">{{ player }}</label><br>
+            <label for="{{ player }}">{{ player }}</label><br>
         {% endfor %}
 
         {% if game_info['current_player'] == game_info['num_of_players'] %}
