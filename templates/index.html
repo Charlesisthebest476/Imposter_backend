@@ -9,15 +9,17 @@
 <body>
   <h1>Welcome to imposter!</h1>
   <form method="post">
-    <p>Number of Players: <input type="number" name="num_of_players" min="3" max="10" step="1" placeholder="Enter the # of players" required></p>
-    <p>Number of Imposters: <input type="number" name="num_of_imposters" min="1" max="10" step="1" placeholder="Enter the number of imposters" required></p>
+    <p><input type="number" name="num_of_players" placeholder="Enter the # of players" required></p>
+    <p><input type="text" name="num_of_imposters" placeholder="Enter the number of imposters" required></p>
     <!-- add a list and iterate over it from app-->
-    <p>Please Select One or Multiple of the Following Categories (cmd+click for multi-select): </p>
-    <p><select name="category" id="category" multiple>
+    <div class="category-container">
       {% for category in categories: %}
-        <option value="{{ category }}">{{ category }}</option>
+        <label>
+          <input type="checkbox" name="category" value="{{ category }}">
+          {{ category }}
+        </label>
       {% endfor %}
-    </select></p>
+    </div>
     <p><button type="submit">Submit</button></p>
   </form>
   {% if result%}
