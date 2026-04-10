@@ -13,10 +13,10 @@
     <form method="post">
         {% if game_info['most_voted_player'] is none %}
             <p>The vote is tied. No one is voted out. Play one more round before voting again.</p>
-            <p><input type="submit" name="action" value="Revote"></p>
+            <p><input type="submit" name="action" value="Revote" class="button"></p>
         {% else %}
             <p>{{ game_info['most_voted_player'] }} is voted out!</p>
-            <p><input type="submit" name="action" value="Continue"></p>
+            <p><input type="submit" name="action" value="Continue" class="button"></p>
         {% endif %}
     </form>
 </body>
