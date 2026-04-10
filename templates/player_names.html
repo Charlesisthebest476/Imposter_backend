@@ -4,6 +4,21 @@
   <meta charset="UTF-8">
   <link href="{{ url_for('static', filename='style.css') }}" rel="stylesheet"> <!-- Link to mayber different CSS file -->
   <title>Player Names</title>
+  <script>
+    function validateForm() {
+      const namesNodeList = document.querySelectorAll("input[type='text']");
+      let validatedNames = [];
+      for (let i = 0; i < namesNodeList.length; i++) {
+        if (!validatedNames.includes(namesNodeList[i])) {
+          validatedNames.push(namesNodeList[i]);
+        } else {
+          alert("Duplicate player names are not allowed. Please enter unique names.");
+          return false; // Prevent form submission
+        }
+      }
+      return true; // Allow form submission
+    }
+  </script>
 </head>
 <body>
   <h1>Player Names</h1>
