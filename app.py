@@ -9,6 +9,7 @@ March 30th - Version 1.5: Added environment variables to ensure security
 April 1st - Version 1.6: Replaced URL data passing with Flask sessions for better security
 April 8th - Version 1.7: Working on voting system
 April 9th - Version 1.8: Completing the prototype, including final game logic, voting system, and imposter guess word
+April 14th - Version 1.9: Beta testing
 """
 
 
@@ -22,14 +23,11 @@ from rules import Rules #import rules class
 
 
 
-
 rules = Rules()
 
 
 
-
-
-CATEGORIES = ["Food", "Animal", "Location"]  # Example categories
+CATEGORIES = ["Food", "Animal", "Location", "Hobbies", "Household", "Movies/TV", "Occupations", "Sports"]  # Example categories
 AI_MODELS = ["gemini-3.1-flash-lite-preview", "gemini-2.5-flash-lite", "gemini-2.0-flash-lite"]
 KEY = os.environ.get("KEY")
 
@@ -40,7 +38,6 @@ app.secret_key = os.environ.get("SECRET_KEY")
 client = genai.Client(api_key=KEY) #replace with actual API
 
 
-
 # Check token usage(not used currently)
 """
 total_tokens = client.models.count_tokens(
@@ -48,8 +45,6 @@ total_tokens = client.models.count_tokens(
     contents =
 )
 """
-
-
 
 
 #Call function to prompt gemini
@@ -174,7 +169,6 @@ def gemini(cat):
 
 
 
-
 def chooseimposter(num_of_players, num_of_imposters):
     # Create a list of players
     players = list(range(1, num_of_players + 1))
@@ -200,8 +194,6 @@ def index():
     categories = CATEGORIES
 
 
-
-
     if request.method == 'POST':
         # Get the data from the form
         num_of_players = int(request.form['num_of_players'])
@@ -210,7 +202,7 @@ def index():
             return redirect(url_for('error')) # Redirect to an error page if the number of imposters is greater than the number of players
         imposters = chooseimposter(num_of_players, num_of_imposters)
         player_category_selection = request.form.getlist('category')
-        print(f"Player category selection: {player_category_selection}") #debug
+        #print(f"Player category selection: {player_category_selection}") #debug
 
 
         try: #code in case gemini fails to generate words
