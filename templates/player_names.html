@@ -6,8 +6,8 @@
   <title>Player Names</title>
   <script>
     function validateForm() {
-      const namesList = document.querySelectorAll('input[type="text"]');
-      const validatedNames = [];
+      const namesList = document.querySelectorAll('input[type="text"]').value;
+      let validatedNames = [];
       for (const name of namesList) {
         if (!validatedNames.includes(name)) {
           validatedNames.push(name);
