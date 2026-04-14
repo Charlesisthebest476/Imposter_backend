@@ -9,24 +9,23 @@
       const numOfPlayers = document.querySelector('input[name="num_of_players"]').value;
       const numOfImposters = document.querySelector('input[name="num_of_imposters"]').value;
       const checkboxes = document.querySelectorAll('input[type="checkbox"]:checked');
-      const form = document.getELementById("form");
       if (numOfImposters >= numOfPlayers) {
         alert("Number of imposters must be less than the number of players.");
+        return false;
       }else if (checkboxes.length == 0) {
         alert("Must select at least 1 category.");
-      }else {
-        form.requestSubmit();
+        return false;
       }
+      return true;
     }
 
-    const button = document.querySelector("button");
-    button.addEventListener("click", validateForm);
+    
     
   </script>
 </head>
 <body>
   <h1>Welcome to imposter!</h1>
-  <form id="form" method="post">
+  <form id="form" method="post" onsubmit="return validateForm()">
     <p><input type="number" name="num_of_players" placeholder="Enter the number of players" required></p>
     <p><input type="number" name="num_of_imposters" placeholder="Enter the number of imposters" required></p>
     <!-- add a list and iterate over it from app-->
@@ -38,7 +37,7 @@
         </label>
       {% endfor %}
     </div>
-    <p><button type="button">Submit</button></p>
+    <p><button type="submit">Submit</button></p>
   </form>
   {% if result%}
     <p>Result: {{ result }}</p>
