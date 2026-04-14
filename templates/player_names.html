@@ -7,10 +7,10 @@
   <script>
     function validateForm() {
       const namesList = document.querySelectorAll('input[type="text"]');
-      let validatedNames = [];
-      for (let i = 0; i < namesList.length; i++) {
-        if (!validatedNames.includes(namesList[i])) {
-          validatedNames.push(namesList[i]);
+      const validatedNames = [];
+      for (const name of namesList) {
+        if (!validatedNames.includes(name)) {
+          validatedNames.push(name);
         }else {
           alert("Duplicate player names are not allowed. Please enter unique names.");
           return false; // Prevent form submission
@@ -22,7 +22,7 @@
 </head>
 <body>
   <h1>Player Names</h1>
-  <form method="POST" onsubmit="validateForm()">
+  <form method="POST" onsubmit="return validateForm()">
     <p><label for="player_names">Enter Player Names:</label></p>
     {% for i in range(game_info['num_of_players']) %} <!-- placeholder -->
       <input type="text" name="player_name_{{i+1}}" placeholder="Player {{i+1}}" required><br>
