@@ -47,6 +47,70 @@ total_tokens = client.models.count_tokens(
 """
 
 
+class Model:
+    content = ("Select one category from the list below. Generate a random target word (concept, object, or place; max 3 words) "
+    "belonging to that category. Provide 5 hint words that are related but not synonyms and do not contain the target word. "
+    "Hints should be challenging and avoid immediate obvious associations. Output Format: A single comma-separated string "
+    "containing the target word followed by the five hints. Categories:"
+    )
+
+    safety_settings=[
+        types.SafetySetting(
+            category="HARM_CATEGORY_HARASSMENT",
+            threshold="BLOCK_ONLY_HIGH",  # Block few
+        ),
+        types.SafetySetting(
+            category="HARM_CATEGORY_HATE_SPEECH",
+            threshold="BLOCK_ONLY_HIGH",  # Block few
+        ),
+        types.SafetySetting(
+            category="HARM_CATEGORY_SEXUALLY_EXPLICIT",
+            threshold="BLOCK_ONLY_HIGH",  # Block few
+        ),
+        types.SafetySetting(
+            category="HARM_CATEGORY_DANGEROUS_CONTENT",
+            threshold="BLOCK_ONLY_HIGH",  # Block few
+        ),
+        ]
+    
+
+    def __init__(self, model, cat):
+        self.model = model
+        self.cat = cat
+    
+    def select_thinking_build(self):
+        if "3.1" in self.model:
+            return types.ThinkingConfig(thinking_level = "MEDIUM")
+        elif "2.5" in self.model:
+            return types.ThinkingConfig(thinking_budget= 3000)
+        else:
+            return None
+
+    def get_response(self):
+        try:
+            config = self.select_thinking_build()
+
+            response = client.models.generate_content(
+                model = self.model,
+                config = types.GenerateContentConfig(
+                    thinking_config = config if config else None,
+                    safety_settings=self.__class__.safety_settings
+                ),
+                contents = self.__class__.content + (', '.join(self.cat))
+            )
+            return response.text
+        except:
+            return None
+
+def gemini(cat):
+    response = None
+    i = 0
+    while not response and i < len(AI_MODELS):
+        model = Model(AI_MODELS[i], cat)
+        response = model.get_response()
+        i+=1
+
+"""old code
 #Call function to prompt gemini
 def gemini(cat):
     i = 0
@@ -164,7 +228,7 @@ def gemini(cat):
         raise Exception("All AI models failed to generate a response") #if all models fail, raise an exception to be caught in the index function
     #returns a list and first word is the normal word and second word is the imposter word
     return response.text.split(",") #split the response into two words based on the comma
-
+"""
 
 
 
