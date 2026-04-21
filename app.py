@@ -10,6 +10,7 @@ April 1st - Version 1.6: Replaced URL data passing with Flask sessions for bette
 April 8th - Version 1.7: Working on voting system
 April 9th - Version 1.8: Completing the prototype, including final game logic, voting system, and imposter guess word
 April 14th - Version 1.9: Beta testing
+April 29th - Version 1.9.1: Attempting to fix AI iteration issue using class
 """
 
 
@@ -83,8 +84,7 @@ class Model:
             return types.ThinkingConfig(thinking_level = "MEDIUM")
         elif "2.5" in self.model:
             return types.ThinkingConfig(thinking_budget= 3000)
-        else:
-            return None
+        return None
 
     def get_response(self):
         try:
@@ -93,13 +93,14 @@ class Model:
             response = client.models.generate_content(
                 model = self.model,
                 config = types.GenerateContentConfig(
-                    thinking_config = config if config else None,
+                    thinking_config = config,
                     safety_settings=self.__class__.safety_settings
                 ),
                 contents = self.__class__.content + (', '.join(self.cat))
             )
             return response.text
         except:
+            print(f"Model {self.model} failed to generate a response.")#debug
             return None
 
 def gemini(cat):
@@ -108,7 +109,11 @@ def gemini(cat):
     while not response and i < len(AI_MODELS):
         model = Model(AI_MODELS[i], cat)
         response = model.get_response()
+        print(response)
         i+=1
+    if not response:
+        raise Exception("All AI models failed to generate a response") #if all models fail, raise an exception to be caught in the index function
+    return response.split(",")
 
 """old code
 #Call function to prompt gemini
