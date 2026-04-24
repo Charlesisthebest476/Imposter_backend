@@ -49,10 +49,11 @@ total_tokens = client.models.count_tokens(
 
 
 class Model:
-    content = ("Select one category from the list below. Generate a random target word (concept, object, or place; max 3 words) "
-    "belonging to that category. Provide 5 hint words that are related but not synonyms and do not contain the target word. "
-    "Hints should be challenging and avoid immediate obvious associations. Output Format: A single comma-separated string "
-    "containing the target word followed by the five hints. Categories:"
+    content = ("Select one category from the list below. Generate a random target word (concept, object, or place; max 3 words) belonging to that category. "
+    "The criteria for word generation are to avoid complex vocabulary and to focus on words that are common. This means that a native sixth grader should be "
+    "able to understand the words provided. Provide 5 hint words that are related but not synonyms and do not contain the target word. Hints should avoid "
+    "immediately obvious associations, but may be attributes of the target word. Output Format: A single comma-separated string containing the target "
+    "word followed by the five hints. Categories:"
     )
 
     safety_settings=[
@@ -97,7 +98,7 @@ class Model:
                     thinking_config = config,
                     safety_settings=self.__class__.safety_settings
                 ),
-                contents = self.__class__.content + (', '.join(self.cat)) + f". The hint words cannot be one of the following words"
+                contents = cont
             )
             return response.text
         except:
