@@ -9,8 +9,8 @@
       const numOfPlayers = document.querySelector('input[name="num_of_players"]').value;
       const numOfImposters = document.querySelector('input[name="num_of_imposters"]').value;
       const checkboxes = document.querySelectorAll('input[type="checkbox"]:checked');
-      if (numOfImposters >= numOfPlayers) {
-        alert("Number of imposters must be less than the number of players.");
+      if (numOfImposters >= numOfPlayers//2) {
+        alert("Number of imposters must be less than half the number of total players.");
         return false;
       }else if (checkboxes.length == 0) {
         alert("Must select at least 1 category.");
