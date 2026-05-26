@@ -7,12 +7,14 @@
 </head>
 <body>
     <h1>ImposterRandom</h1>
-    <h2>Select the mode:</h2>
+    <h2>Select a mode:</h2>
     <form method="post">
         <input type="radio" name="mode" id="classic" value="classic" onclick="show_description('disc-classic')">
         <label for="classic">Classic</label>
         <div class="description" id="disc-classic">
             In the classic mode, one or more players are chosen as the imposter(s) and not given the secret word. The goal for the group is to find and vote out the liar, while the imposter must bluff and blend in to win.
+            During the game: Each player is expected to take turns saying a word associated with the common word. Players will vote on who they think the imposter is/are at the end. 
+            After the game: If a normal player/citizen is voted out, the imposter wins. If the imposter get voted out, they have a chance at guessing the word. 
         </div>
         <input type="radio" name="mode" id="chaos" value="chaos" onclick="show_description('disc-chaos')">
         <label for="chaos">Chaos</label>
