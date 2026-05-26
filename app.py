@@ -30,7 +30,7 @@ rules = Rules()
 
 
 CATEGORIES = ["Food", "Animal", "Location", "Hobbies", "Household", "Movies/TV", "Occupations", "Sports"]  # Example categories
-AI_MODELS = ["gemini-3.1-flash-lite-preview", "gemini-2.5-flash-lite", "gemini-2.0-flash-lite", "gemini-2.5-flash"]
+AI_MODELS = ["gemini-3.1-flash-lite", "gemini-2.5-flash-lite", "gemini-2.0-flash-lite", "gemini-2.5-flash"]
 KEY = os.environ.get("KEY")
 
 app = Flask(__name__)
