@@ -11,6 +11,7 @@ April 8th - Version 1.7: Working on voting system
 April 9th - Version 1.8: Completing the prototype, including final game logic, voting system, and imposter guess word
 April 14th - Version 1.9: Beta testing
 April 29th - Version 1.9.1: Attempting to fix AI iteration issue using class
+May 25th - Version 1.9.2: Adding a different mode, fixed different imposter words, revised the prompt
 """
 
 
@@ -29,7 +30,7 @@ rules = Rules()
 
 
 CATEGORIES = ["Food", "Animal", "Location", "Hobbies", "Household", "Movies/TV", "Occupations", "Sports"]  # Example categories
-AI_MODELS = ["gemini-3.1-flash-lite-preview", "gemini-2.5-flash-lite", "gemini-2.0-flash-lite"]
+AI_MODELS = ["gemini-3.1-flash-lite-preview", "gemini-2.5-flash-lite", "gemini-2.0-flash-lite", "gemini-2.5-flash"]
 KEY = os.environ.get("KEY")
 
 app = Flask(__name__)
@@ -50,10 +51,12 @@ total_tokens = client.models.count_tokens(
 
 class Model:
     content = ("Select one category from the list below. Generate a random target word (concept, object, or place; max 3 words) belonging to that category. "
+    "The target word must be a specific, concrete item, object, or concept within that category, NOT a broad category name itself."
     "The criteria for word generation are to avoid complex vocabulary and to focus on words that are common. This means that a native sixth grader should be "
     "able to understand the words provided. Provide 5 hint words that are related but not synonyms and do not contain the target word. Hints should avoid "
-    "immediately obvious associations, but may be attributes of the target word. Output Format: A single comma-separated string containing the target "
-    "word followed by the five hints. Categories:"
+    "immediately obvious associations. The hint word should not be a subcategory of the target word. A player "
+    "should NOT be able to easily guess the target word just from the hints, but once the target word is revealed, the connection to the hints must feel "
+    "logical in reverse. Output Format: A single comma-separated string containing the target word followed by the five hints. The category given is "
     )
 
     safety_settings=[
@@ -90,7 +93,7 @@ class Model:
     def get_response(self):
         try:
             config = self.select_thinking_build()
-            cont = self.__class__.content + (', '.join(self.cat)) + f". The hint words cannot be one of the following words: {", ".join(session.get('previous_words', []))}"
+            cont = self.__class__.content + self.cat + f". The hint words cannot be one of the following words: {',' .join(session.get('previous_words', []))}"
 
             response = client.models.generate_content(
                 model = self.model,
@@ -101,8 +104,8 @@ class Model:
                 contents = cont
             )
             return response.text
-        except:
-            print(f"Model {self.model} failed to generate a response.")#debug
+        except Exception as e:
+            print(f"Model {self.model} failed to generate a response. {e}")#debug
             return None
 
 def gemini(cat):
@@ -249,26 +252,41 @@ def chooseimposter(num_of_players, num_of_imposters):
 
     return imposters
 
+def pick_random_word(wordList, number_of_players):
+    selected_words = []
+    for _ in range(number_of_players):
+        selected_words.append(random.choice(wordList))
+    return selected_words
 
 
 
 
-
-
-
-
-
-
-
-@app.route("/", methods=['GET', 'POST'])
+@app.route("/", methods=['GET','POST'])
 def index():
+    if request.method == 'POST':
+        mode = request.form.get('mode')
+        return redirect(url_for('start', mode=mode))
+    return render_template("index.html")
+
+
+
+
+
+@app.route("/start", methods=['GET', 'POST'])
+def start():
     categories = CATEGORIES
+    mode = request.args.get('mode')
 
 
     if request.method == 'POST':
         # Get the data from the form
         num_of_players = int(request.form['num_of_players'])
-        num_of_imposters = int(request.form['num_of_imposters'])
+        num_of_imposters = request.form.get('num_of_imposters')
+        if num_of_imposters:
+            num_of_imposters = int(num_of_imposters)
+        else:
+            num_of_imposters = random.randint(1, num_of_players - 1)
+        
         if num_of_imposters > num_of_players:
             return redirect(url_for('error')) # Redirect to an error page if the number of imposters is greater than the number of players
         imposters = chooseimposter(num_of_players, num_of_imposters)
@@ -277,23 +295,24 @@ def index():
 
 
         try: #code in case gemini fails to generate words
-            word = gemini(player_category_selection)
+            word = gemini(random.choice(player_category_selection))
             setup_data = {
                 "num_of_players": num_of_players,
                 "num_of_imposters": num_of_imposters,
                 "category": player_category_selection,
                 "imposters": imposters,
                 "normal_word": word[0], 
-                "imposter_word":word[random.randint(1,4)], 
+                "imposter_word":pick_random_word(word[1:], num_of_imposters), 
                 "current_player": 1,
-                "current_role": "hidden"
+                "current_role": "hidden",
+                "mode": mode
             }
             session['game_data'] = setup_data  # Store data in session
             return redirect(url_for('player_names'))
         except Exception as e:
             session['error'] = str(e)
             return redirect(url_for('error')) # Redirect to an error page if gemini fails to generate words
-    return render_template("index.html", categories=categories)
+    return render_template("start.html", categories=categories, mode=mode)
 
 
 
@@ -305,6 +324,7 @@ def player_names():
         for value in request.form.items():
             name_list.append(value[1]) #this is the content
         session['game_data']['player_names'] = name_list
+        session['game_data']['imposter_counter'] = 0
         session.modified = True
         return redirect(url_for('game'))
     return render_template("player_names.html", game_info=session.get('game_data')) #pass the info from the index page to the player names page so we can use it in the form
@@ -317,7 +337,7 @@ def player_names():
     "category": ["Food"],
     "imposters": [2, 4],
     "normal_word": "Pizza",
-    "imposter_word": "Burger",
+    "imposter_word": ["Burger", "pineapple"],
     "current_player": 1,
     "current_role": "hidden",
     "player_names": ["Alice", "Bob", "Charlie", "David", "Eve"]
@@ -344,7 +364,8 @@ def game():
             #detect imposter
             if session['game_data']['current_player'] in session['game_data']['imposters']:
                 session['game_data']['current_role'] = "Imposter"
-                session['game_data']['word'] = session['game_data']['imposter_word']
+                session['game_data']['word'] = session['game_data']["imposter_word"][session['game_data']['imposter_counter']]
+                session['game_data']['imposter_counter'] += 1
             else:
                 session['game_data']['current_role'] = "Citizen"
                 session['game_data']['word'] = session['game_data']['normal_word']
@@ -370,7 +391,7 @@ def who_start():
     "category": ["Food"],
     "imposters": [2, 4],
     "normal_word": "Pizza",
-    "imposter_word": "Burger",
+    "imposter_word": ["Burger", "pineapple"],
     "current_player": 1,
     "current_role": "hidden",
     "player_names": ["Alice", "Bob", "Charlie", "David", "Eve"],
