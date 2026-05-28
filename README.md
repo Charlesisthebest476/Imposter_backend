@@ -24,6 +24,7 @@ If there are any comments or issues, please contact us through unipathwll@gmail.
 Sources
 Bibliography
 [1]“PyTutorial | Flask app.route() Guide: Define URL Routes Like a Pro,” Pytutorial.com, Nov. 15, 2024. https://pytutorial.com/flask-approute-guide-define-url-routes-like-a-pro/
+
 [2]R. Python, “HTML and CSS for Python Developers – Real Python,” realpython.com. https://realpython.com/html-css-python/
 [3]Vaibhav, “How to Run Python in HTML,” Delft Stack, Oct. 06, 2021. https://www.delftstack.com/howto/python/python-in-html/ (accessed May 28, 2026).
 [4]“HTML Comments,” www.w3schools.com. https://www.w3schools.com/html/html_comments.asp
