@@ -1,4 +1,5 @@
-# Imposter_backend
+# ImposterWLL
+An offine game that mimics the popular online game Imposter AI but with added randomness
 
 features - - - -
 
