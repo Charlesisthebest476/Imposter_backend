@@ -1,9 +1,14 @@
 # ImposterWLL
-An offine game that mimics the popular online game Imposter AI but with added randomness
+An offline game that mimics the popular online game Imposter AI but with added randomness
 
 features - - - -
+- Implementation of real-time AI-generated responses
+- Classic Imposter AI game mode
+- Additional game mode - chaos mode, with a random number of imposters
+- Added online voting system and additional game logic that will decide the results of the game
 
 Installations
+Clone the repository and execute the following commands in the terminal
 - pip install flask
   
 - pip install gunicorn
@@ -11,8 +16,10 @@ Installations
 - pip install google-genai
 
 Known bugs - - -
+Not applicable
 
 Support
+If there are any comments or issues, please contact us through unipathwll@gmail.com
 
 Sources
 Bibliography
